@@ -16,7 +16,6 @@ import ExchangeMoneyForm from '../components/ExchangeMoneyForm.vue'
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
   grid-template-rows: repeat(2, fit-content(100%));
-  font-family: $font-family;
   justify-items: center;
   min-height: 100vh;
   width: 100%;

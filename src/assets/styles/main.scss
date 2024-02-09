@@ -1,4 +1,32 @@
 * {
+  background-color: transparent;
+  border: 0px;
+  box-sizing: border-box;
+  font-family: $font-family;
   margin: 0px;
   padding: 0px;
+  outline: none;
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+button {
+  background-color: transparent;
+  border: 0px;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
