@@ -3,6 +3,8 @@ import { onMounted, ref, type Ref } from 'vue'
 import { useCurrencyStore } from '@/stores/currency'
 import ExchangeInputsForm from './ExchangeInputsForm.vue'
 import TabsForm from './TabsForm.vue'
+import { useCollection, useFirestore, useDocument } from 'vuefire'
+import { collection, doc } from 'firebase/firestore'
 
 const inputs: Ref<
   { id: number; code: string; currency: string; symbol: string; value: number | string }[]
@@ -22,6 +24,11 @@ const inputs: Ref<
     value: 3945
   }
 ])
+
+const db = useFirestore()
+const rates = useCollection(collection(db, 'rates'))
+const someRate = useDocument(doc(collection(db, 'rates'), 'awaOMswZ8JGxjmHCpVZ4'))
+console.log(rates, someRate)
 
 const tabs: Ref<{ id: number; active: boolean; code: string; price: number; title: string }[]> =
   ref([
