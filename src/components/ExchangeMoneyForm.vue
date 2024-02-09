@@ -1,7 +1,27 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
+import { useCurrencyStore } from '@/stores/currency'
 import ExchangeInputsForm from './ExchangeInputsForm.vue'
 import TabsForm from './TabsForm.vue'
+
+const inputs: Ref<
+  { id: number; code: string; currency: string; symbol: string; value: number | string }[]
+> = ref([
+  {
+    id: 1,
+    code: 'USD',
+    currency: 'Dólares',
+    symbol: '$',
+    value: 1000
+  },
+  {
+    id: 2,
+    code: 'PEN',
+    currency: 'Soles',
+    symbol: 'S/',
+    value: 3945
+  }
+])
 
 const tabs: Ref<{ id: number; active: boolean; code: string; price: number; title: string }[]> =
   ref([
@@ -20,13 +40,43 @@ const tabs: Ref<{ id: number; active: boolean; code: string; price: number; titl
       price: 3.945
     }
   ])
+
+const { updateCurrency } = useCurrencyStore()
+
+onMounted(() => updateCurrency(inputs.value[0].code))
+
+const updateInputsByCurrency = (code: string, model: number) => {
+  const tabSelected = tabs.value.find(
+    (tab) => tab.code === (code === 'USD' ? 'purchase' : 'sale')
+  ) || { price: 0 }
+  inputs.value[inputs.value.findIndex((i) => i.code !== code)].value = (
+    (code === 'USD' ? model * tabSelected.price : model / tabSelected.price) as number
+  ).toFixed(2)
+}
+
+const sortInputs = (code: string) => {
+  inputs.value.sort((a, b) => (code === 'sale' ? b.id - a.id : a.id - b.id))
+  updateCurrency(inputs.value[0].code)
+}
+
+const onChangeTab = (tab: { code: string; id: number }) => {
+  tabs.value = tabs.value.map((t) => ({
+    ...t,
+    active: t.id === tab.id
+  }))
+  sortInputs(tab.code)
+}
 </script>
 
 <template>
   <form class="exchange-form">
-    <tabs-form :tabs="tabs" />
+    <tabs-form :tabs="tabs" @on-click="onChangeTab" />
     <section class="exchange-form__body">
-      <exchange-inputs-form :purchase-price="tabs[0].price" :sale-price="tabs[1].price" />
+      <exchange-inputs-form
+        :inputs="inputs"
+        @update-inputs-by-currency="updateInputsByCurrency"
+        @on-click="onChangeTab(tabs.find((t) => !t.active) || { code: '', id: 0 })"
+      />
       <button class="exchange-form__button">Iniciar operación</button>
     </section>
   </form>
@@ -35,7 +85,7 @@ const tabs: Ref<{ id: number; active: boolean; code: string; price: number; titl
 .exchange-form {
   @include linear-gradient(left, ($white, $smoke));
   display: grid;
-  justify-content: center;
+  justify-items: center;
   padding: 21px 0px 26px;
   width: 100%;
 

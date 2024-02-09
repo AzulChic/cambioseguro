@@ -4,6 +4,8 @@ interface Props {
 }
 
 defineProps<Props>()
+
+const emit = defineEmits(['on-click'])
 </script>
 
 <template>
@@ -13,6 +15,7 @@ defineProps<Props>()
       :key="tabIdx"
       class="tabs-item"
       :class="{ 'tabs-item--active': tab.active }"
+      @click.prevent="emit('on-click', tab)"
     >
       <p class="tabs-item__title">{{ tab.title }}</p>
       <span class="tabs-item__price">{{ tab.price }}</span>
@@ -27,6 +30,7 @@ defineProps<Props>()
   grid-template-columns: repeat(2, fit-content(100%));
   grid-template-rows: repeat(1, minmax(0, 1fr));
   justify-content: space-evenly;
+  width: 100%;
 
   &-item {
     @include font-style($x-small, $regular, 14.22px, $gray);

@@ -1,48 +1,37 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
 import InputForm from './InputForm.vue'
 
 interface Props {
-  purchasePrice: number
-  salePrice: number
+  inputs: Array<{
+    id: number
+    code: string
+    currency: string
+    symbol: string
+    value: number | string
+  }>
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
-const inputs: Ref<
-  { id: number; code: string; currency: string; label: string; symbol: string; value: number }[]
-> = ref([
-  {
-    id: 1,
-    code: 'USD',
-    currency: 'Dólares',
-    label: 'Envías',
-    symbol: '$',
-    value: 1000
-  },
-  {
-    id: 2,
-    code: 'PEN',
-    currency: 'Soles',
-    label: 'Recibes',
-    symbol: 'S/',
-    value: 3945
-  }
-])
+const emit = defineEmits(['update-inputs-by-currency', 'on-click'])
 
-const updateInputsByCurrency = ({ code }: { code: string }, model: number) => {
-  inputs.value[inputs.value.findIndex((i) => i.code !== code)].value =
-    model * (code === 'USD' ? props.purchasePrice : props.salePrice)
+const onInput = ({ code }: { code: string }, model: number) => {
+  emit('update-inputs-by-currency', code, model)
 }
 </script>
 
 <template>
   <div class="exchange-inputs-form">
-    <button class="exchange-inputs-form__button">
+    <button class="exchange-inputs-form__button" @click.prevent="emit('on-click')">
       <img src="../assets/icons/switch.svg" height="42" width="42" />
     </button>
     <template v-for="(item, idx) in inputs" :key="idx">
-      <input-form v-model="item.value" :settings-data="item" @on-input="updateInputsByCurrency" />
+      <input-form
+        v-model="item.value"
+        :label="idx === 0 ? 'Envías' : 'Recibes'"
+        :settings-data="item"
+        @on-input="onInput"
+      />
     </template>
   </div>
 </template>

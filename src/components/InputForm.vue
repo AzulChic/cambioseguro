@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, type Ref } from 'vue'
+import { computed } from 'vue'
 
 interface Props {
+  label: string
   modelValue: number | any
   settingsData: {
     id: number
     code: string
     currency: string
-    label: string
     symbol: string
-    value: number
+    value: number | string
   }
 }
 
@@ -17,13 +17,15 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['update:modelValue', 'on-input'])
 
-const internalValue = computed<number>({
+const internalValue = computed<number | string>({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 })
 
-const qtyDigits: Ref<number> = ref(`${internalValue.value}`.length)
-
+const qtyDigits = computed<number>({
+  get: () => props.modelValue.toString().length,
+  set: (value) => value
+})
 const symbolPosition = computed<string>(() => `${16 + 10.5 * qtyDigits.value}px`)
 
 const limitChars = (payload: KeyboardEvent) => {
@@ -44,7 +46,7 @@ const updateQtyDigits = (payload: Event) => {
 <template>
   <div class="input-form">
     <section class="input-form__currency">{{ settingsData.currency }}</section>
-    <label class="input-form__label" :for="`${settingsData.id}`">{{ settingsData.label }}</label>
+    <label class="input-form__label" :for="`${settingsData.id}`">{{ label }}</label>
     <p class="input-form__symbol">{{ settingsData.symbol }}</p>
     <input
       v-model="internalValue"
